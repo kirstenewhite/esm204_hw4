@@ -1,0 +1,33 @@
+---
+title: "HW4"
+author: "Kirsten White"
+date: "5/18/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(tidyverse)
+library(janitor)
+library(equatiomatic)
+library(broom)
+```
+
+```{r}
+# Read in both datasets
+
+damages_data <- read_csv(here("damages.csv"))
+
+warming_data <- read_csv(here("warming.csv"))
+
+```
+
+Question # 1 
+
+Estimate a quadratic damage function relating the dollar value of damages to the change in global mean temperature. Estimate a model with a zero intercept because damages by construction must equal zero when there is no climate change. Plot your estimated damage function, overlaid with a scatterplot of the underlying data.
+
+```{r}
+
+```
+
