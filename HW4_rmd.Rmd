@@ -6,10 +6,9 @@ output:
   html_document: 
     toc: yes
     collapsed: yes
-    highlight: espresso
+    highlight: textmate
     theme: journal
     code_folding: hide
-    
 ---
 
 ```{r setup, include=FALSE, message = FALSE, warning = FALSE}
@@ -70,3 +69,17 @@ ggplot(data = damages, aes(x = warming, y = damages)) +
 
 **Figure 1**: Quadratic regression fitted to cost of environmental damages as a function of warming. The equation is: 
 $$ \hat D = 1.941 \times 10^{13} T ^ 2 - 1.060 \times 10^{12} T $$
+
+## Question 2 
+
+Use warming.csv and your estimated damage function to predict damages in each year under the baseline climate and the pulse scenario. Make four plots: 
+(1) damages over time without the pulse, 
+(2) damages over time with the pulse, 
+(3) the difference in damages over time that
+arises from the pulse, and 
+(4) the difference in damages over time from the pulse per ton of CO2 (you can assume that each ton of the pulse causes the same amount of damage).
+
+```{r}
+
+```
+
