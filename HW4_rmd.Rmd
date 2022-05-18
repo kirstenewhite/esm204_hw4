@@ -1,8 +1,15 @@
 ---
-title: "HW4"
+title: "ESM 204 Homework 4: Calculating the SCC and Policy Choice under Uncertainty"
 author: "Kirsten White"
 date: "5/18/2022"
-output: html_document
+output: 
+  html_document: 
+    toc: yes
+    collapsed: yes
+    highlight: espresso
+    theme: journal
+    code_folding: hide
+    
 ---
 
 ```{r setup, include=FALSE, message = FALSE, warning = FALSE}
@@ -17,17 +24,49 @@ library(broom)
 ```{r}
 # Read in both datasets
 
-damages_data <- read_csv(here("damages.csv"))
+damages <- read_csv(here("damages.csv"))
 
-warming_data <- read_csv(here("warming.csv"))
+warming <- read_csv(here("warming.csv"))
 
 ```
 
-Question # 1 
+## Question 1 
 
 Estimate a quadratic damage function relating the dollar value of damages to the change in global mean temperature. Estimate a model with a zero intercept because damages by construction must equal zero when there is no climate change. Plot your estimated damage function, overlaid with a scatterplot of the underlying data.
 
 ```{r}
 
+damages$warming2 <- damages$warming^2
+
+# Run quadratic regression relating damages to warming with a zero intercept
+damages_qm <- lm(damages ~ 0 +  warming + warming2, data = damages)
+
+# Extract the equation of the line 
+extract_eq(model = damages_qm, use_coefs = TRUE, coef_digits = 4)
+
+
+# Equation of the line for total damages as function of warming (temperature)
+# Damages = 1.9x10^13T^2 - 1.06x10^12T
+model_damages <- function(x){damages_qm$coefficients[2]*x^2 - damages_qm$coefficients[1]*x}
+
+# The above values are: 
+damages_qm$coefficients[1]
+# -1059530137756.23
+damages_qm$coefficients[2]
+# 19409275730643.3
+
+# Plot damages as function of warming (using quadratic regression model)
+#    - include scatterplot of underlying data 
+ggplot(data = damages, aes(x = warming, y = damages)) +
+  stat_function(fun = model_damages, color = "goldenrod1", size = 1) +
+  geom_point(size = 1, color = "grey53") +
+  labs(x = "Temperature (C)",
+       y = "Total Damages ($)", 
+       title = "Climate Change Damages due to Warming", 
+       caption = "Formula: Demand = 1.94x10^13T^2 - 1.06x10^12T") +
+  theme_grey()+
+    theme(plot.title = element_text(hjust = 0.5, size = 12))
 ```
 
+**Figure 1**: Quadratic regression fitted to cost of environmental damages as a function of warming. The equation is: 
+$$ \hat D = 1.941 \times 10^{13} T ^ 2 - 1.060 \times 10^{12} T $$
