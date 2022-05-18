@@ -80,6 +80,12 @@ arises from the pulse, and
 (4) the difference in damages over time from the pulse per ton of CO2 (you can assume that each ton of the pulse causes the same amount of damage).
 
 ```{r}
+# Plot damages over time w/o pulse
 
+# Plot damages over time w/ pulse 
+
+# Plot the difference in damages over time that arise from the pulse
+
+# Plot the the difference in damages over time from the pulse per ton of CO2
 ```
 
