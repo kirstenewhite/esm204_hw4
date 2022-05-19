@@ -82,6 +82,8 @@ arises from the pulse, and
 (4) the difference in damages over time from the pulse per ton of CO2 (you can assume that each ton of the pulse causes the same amount of damage).
 
 ```{r}
+# Add columns to warming dataset calculating each of the scenarios: 
+
 # damages over time w/o pulse
 warming$warming_no_pulse <- model_damages(warming$warming_baseline)
 
@@ -97,14 +99,37 @@ warming$difference_per_ton <- warming$difference/35000000000
 # Plot the above
 
 # damage/time w/o pulse
-ggplot(data = warming, aes(x = year, y = warming_no_pulse)) +
-         geom_point()
+ggplot(data = warming)+
+  geom_point(aes(x = year, y = warming_no_pulse)) +
+  labs(x = "Year", 
+       y = "Damages (w/o pulse)", 
+       title = "Damage without Pulse")+ 
+  theme_grey()
+    
 
 # damage/time w/ pulse
+ggplot(data = warming) +
+  geom_point(aes(x = year, y = warming_w_pulse)) +
+  labs(x = "Year", 
+       y = "Damages (with pulse)", 
+       title = "Damage with Pulse")+ 
+  theme_grey()
 
 # difference in damage/time due to pulse 
+ggplot(data = warming) +
+  geom_point(aes(x = year, y = difference)) +
+  labs(x = "Year", 
+       y = "Difference in Damages (with and w/o pulse)", 
+       title = "Difference in Damages")+ 
+  theme_grey()
 
 # difference in damage/time due to pulse per ton of co2
+ggplot(data = warming) +
+  geom_point(aes(x = year, y = difference_per_ton)) +
+  labs(x = "Year", 
+       y = "Difference in Damages (per ton co2)", 
+       title = "Difference in Damages (per ton of co2)")+ 
+  theme_grey()
 
 
 ```
