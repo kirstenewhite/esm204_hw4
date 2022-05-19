@@ -70,7 +70,7 @@ ggplot(data = damages, aes(x = warming, y = damages)) +
 ```
 
 **Figure 1**: Quadratic regression fitted to cost of environmental damages as a function of warming. The equation is: 
-$$ \hat D = 1.941 \times 10^{13} T ^ 2 - 1.060 \times 10^{12} T $$
+$$ \ D = 1.941 \times 10^{13}  T ^ 2 - 1.060 \times 10^{12} T $$
 
 ## Question 2 
 
@@ -131,6 +131,30 @@ ggplot(data = warming) +
        title = "Difference in Damages (per ton of co2)")+ 
   theme_grey()
 
+
+```
+
+## Question 3
+The SCC is the present discounted value of the stream of future damages caused by one additional ton of CO2. The Obama Administration used a discount rate of 3% to discount damages. Recently, New York State used a discount rate of 2%. Calculate and make a plot of the SCC (y-axis) against the discount rate (x-axis) for a reasonable range of discount rates. Explain the intuition for how the discount rate affects the SCC.
+
+
+The formula to find the present discounted value of damages due to 1 ton of carbon dioxide up to the year 2100 is: 
+
+$$ Present Value = \sum_{t = 0}^{78}{\frac{D_t}{(1+r)^t}}$$
+```{r}
+# Add up the damages due to diff per ton of co2 to find total damages from 2022 to 2100 (78 years) 
+total_damages_per_ton <- sum(warming$difference_per_ton)
+
+# Make a function to calculate NPV 
+npv_damages_function <- function(damage, rate, time, time_initial){
+  NPV <- damage/ (1 + (rate/100))^(time-time_initial)
+  return(NPV)
+}
+
+#  Calculate and make a plot of the SCC (y-axis) against the discount rate (x-axis) for a reasonable range of discount rates.
+# 
+
+# Explain the intuition for how the discount rate affects the SCC.
 
 ```
 
