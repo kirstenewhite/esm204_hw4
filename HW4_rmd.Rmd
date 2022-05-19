@@ -82,12 +82,30 @@ arises from the pulse, and
 (4) the difference in damages over time from the pulse per ton of CO2 (you can assume that each ton of the pulse causes the same amount of damage).
 
 ```{r}
-# Plot damages over time w/o pulse
+# damages over time w/o pulse
+warming$warming_no_pulse <- model_damages(warming$warming_baseline)
 
-# Plot damages over time w/ pulse 
+# damages over time w/ pulse 
+warming$warming_w_pulse <- model_damages(warming$warming_pulse)
 
-# Plot the difference in damages over time that arise from the pulse
+# difference in damages over time that arise from the pulse
+warming$difference <- warming$warming_w_pulse - warming$warming_no_pulse
+  
+# difference in damages over time from the pulse per ton of CO2
+warming$difference_per_ton <- warming$difference/35000000000
 
-# Plot the the difference in damages over time from the pulse per ton of CO2
+# Plot the above
+
+# damage/time w/o pulse
+ggplot(data = warming, aes(x = year, y = warming_no_pulse)) +
+         geom_point()
+
+# damage/time w/ pulse
+
+# difference in damage/time due to pulse 
+
+# difference in damage/time due to pulse per ton of co2
+
+
 ```
 
