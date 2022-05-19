@@ -35,10 +35,12 @@ Estimate a quadratic damage function relating the dollar value of damages to the
 
 ```{r}
 
-damages$warming2 <- damages$warming^2
+# Data is quadratic - create a vector of damages ans warming (w/ warming squared)
+
+damages_warming_sq <- damages$warming^2
 
 # Run quadratic regression relating damages to warming with a zero intercept
-damages_qm <- lm(damages ~ 0 +  warming + warming2, data = damages)
+damages_qm <- lm(damages ~ 0 +  warming + damages_warming_sq, data = damages)
 
 # Extract the equation of the line 
 extract_eq(model = damages_qm, use_coefs = TRUE, coef_digits = 4)
