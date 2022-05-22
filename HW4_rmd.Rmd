@@ -146,10 +146,55 @@ $$ Present Value = \sum_{t = 0}^{78}{\frac{D_t}{(1+r)^t}}$$
 total_damages_per_ton <- sum(warming$difference_per_ton)
 
 # Make a function to calculate NPV 
-npv_damages_function <- function(damage, rate, time, time_initial){
-  NPV <- damage/ (1 + (rate/100))^(time-time_initial)
-  return(NPV)
-}
+NPV <- function(x) {total_damages_per_ton[1:78]/((1+x)^(1:78))}
+
+# make a df for damages by each discount rate from 0.01 to 1.0 
+damages_by_scc <- warming %>%
+  select(year, difference_per_ton) %>%
+  mutate(t_future = year-2022) %>%
+  mutate(present_value_01 = difference_per_ton / ((1 + 0.01) ^ t_future)) %>%
+  mutate(present_value_02 = difference_per_ton / ((1 + 0.02) ^ t_future)) %>%
+  mutate(present_value_03 = difference_per_ton / ((1 + 0.03) ^ t_future))%>%
+  mutate(present_value_04 = difference_per_ton / ((1 + 0.04) ^ t_future)) %>%
+  mutate(present_value_05 = difference_per_ton / ((1 + 0.05) ^ t_future)) %>%
+  mutate(present_value_06 = difference_per_ton / ((1 + 0.06) ^ t_future)) %>%
+  mutate(present_value_07 = difference_per_ton / ((1 + 0.07) ^ t_future)) %>%
+  mutate(present_value_08 = difference_per_ton / ((1 + 0.08) ^ t_future)) %>%
+  mutate(present_value_09 = difference_per_ton / ((1 + 0.09) ^ t_future)) %>%
+  mutate(present_value_1 = difference_per_ton / ((1 + 0.10) ^ t_future))
+  
+damages_by_scc
+
+# Sum the present values by disc rate from 2022 to 2100 
+sum_pv_01 <- sum(damages_by_scc$present_value_01[1:79])
+sum_pv_02 <- sum(damages_by_scc$present_value_02[1:79])
+sum_pv_03 <- sum(damages_by_scc$present_value_03[1:79])
+sum_pv_04 <- sum(damages_by_scc$present_value_04[1:79])
+sum_pv_05 <- sum(damages_by_scc$present_value_05[1:79])
+sum_pv_06 <- sum(damages_by_scc$present_value_06[1:79])
+sum_pv_07 <- sum(damages_by_scc$present_value_07[1:79])
+sum_pv_08 <- sum(damages_by_scc$present_value_08[1:79])
+sum_pv_09 <- sum(damages_by_scc$present_value_09[1:79])
+sum_pv_1 <- sum(damages_by_scc$present_value_1[1:79])
+
+# Create list of all present values (calc above) 
+sum_pv_vector <- c(sum_pv_01, sum_pv_02, sum_pv_03, sum_pv_04, sum_pv_05, sum_pv_06, sum_pv_07, sum_pv_08, sum_pv_09, sum_pv_1)
+
+# Create a list of the discount rates used above (0.01 to 0.10)
+disc_rate_vector <- c(0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10)
+
+# Create df with summed present values and discount rates then plot the values
+pv_disc_rate <- data.frame(sum_pv_vector, disc_rate_vector)
+
+ggplot(data = pv_disc_rate, aes(x = disc_rate_vector, y = sum_pv_vector)) +
+  geom_point() + 
+  geom_line() +
+  scale_x_continuous(n.breaks = 10) +
+  scale_y_continuous(n.breaks = 8) +
+  labs(x = "Discount Rate (%)", 
+       y = "Social Cost of Carbon ($/ton of Carbon Dioxide)", 
+       title = "Social Cost of Carbon by Discount Rate") +
+  theme_grey()
 
 #  Calculate and make a plot of the SCC (y-axis) against the discount rate (x-axis) for a reasonable range of discount rates.
 # 
@@ -157,4 +202,34 @@ npv_damages_function <- function(damage, rate, time, time_initial){
 # Explain the intuition for how the discount rate affects the SCC.
 
 ```
+
+## Question 4
+The National Academies of Sciences, Engineering, and Medicine advised the government in a
+2017 report to use the Ramsey Rule when discounting within the SCC calculation:
+
+$$ r=p+ng $$
+
+
+Using ρ = 0.001, η = 2, and g = 0.01, what is the SCC? 
+Locate this point on your graph from
+above.
+```{r}
+
+```
+
+## Question 5 
+Now suppose there are two possible climate policies that can be pursued. Policy A is business as usual and Policy B is to take immediate and strong action on climate change. Use these
+facts: 
+
+*   If you undertake Policy A there are two possible outcomes. Either warming will occur as in the “baseline” (i.e. “no-pulse”) dataset above (this happens with probability 0.5) or warming each year will be 1.5 times that in the “baseline” dataset (with probability 0.5).
+*   Under Policy B, warming will continue until 2050 as in the “baseline” dataset, and then will stabilize at 1.29 degrees and stay that way forever.
+*   Society is risk neutral
+*   Use a discount rate of 2%
+
+What is the expected present value of damages up to 2100 under Policy A? What is the expected present value of damages up to 2100 under Policy B? Suppose undertaking Policy A costs zero and undertaking Policy B costs X. The total cost of a policy is the implementation
+cost plus expected damages. Make a plot of total cost of Policy A and total cost of Policy B against X. Suppose Congress wants to undertake the policy with the lower total cost. Use your graph to advise Congress.
+
+
+## Question 6 
+Now suppose that society is risk averse. How do you think this would change your advice to Congress?
 
