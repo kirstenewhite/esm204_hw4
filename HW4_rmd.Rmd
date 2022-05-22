@@ -134,6 +134,8 @@ ggplot(data = warming) +
 
 ```
 
+
+
 ## Question 3
 The SCC is the present discounted value of the stream of future damages caused by one additional ton of CO2. The Obama Administration used a discount rate of 3% to discount damages. Recently, New York State used a discount rate of 2%. Calculate and make a plot of the SCC (y-axis) against the discount rate (x-axis) for a reasonable range of discount rates. Explain the intuition for how the discount rate affects the SCC.
 
@@ -186,6 +188,7 @@ disc_rate_vector <- c(0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10
 # Create df with summed present values and discount rates then plot the values
 pv_disc_rate <- data.frame(sum_pv_vector, disc_rate_vector)
 
+# Plot SCC by discount rates ranging from 1 to 10%
 ggplot(data = pv_disc_rate, aes(x = disc_rate_vector, y = sum_pv_vector)) +
   geom_point() + 
   geom_line() +
@@ -203,18 +206,52 @@ ggplot(data = pv_disc_rate, aes(x = disc_rate_vector, y = sum_pv_vector)) +
 
 ```
 
+
+**Figure 6**: Shows the SCC at discount rate values ranging from 1% to 10%. This indicates that, SCC decreases as discount rate increases meaning money is valued more in the present than in the future and impacts in the future are not valued as much.  
+ 
+
 ## Question 4
-The National Academies of Sciences, Engineering, and Medicine advised the government in a
-2017 report to use the Ramsey Rule when discounting within the SCC calculation:
+The National Academies of Sciences, Engineering, and Medicine advised the government in a 2017 report to use the Ramsey Rule when discounting within the SCC calculation:
 
 $$ r=p+ng $$
 
 
 Using ρ = 0.001, η = 2, and g = 0.01, what is the SCC? 
-Locate this point on your graph from
-above.
+Locate this point on your graph from above.
 ```{r}
 
+# find disc rate using ramsey rule with the values above
+ramsey_disc_rate <- (0.001 + 2*0.01)*100 
+      # discount rate with ramsey rule is 2.1%
+
+ramsey_disc_rate
+
+# make a new dataset with present values using rr discount rate of 2.1% (do the same calculations as question 3 but using discount rate of 2.1%)
+
+damages_rr <- warming %>%
+  select(year, difference_per_ton) %>%
+  mutate(t_future = year-2022) %>%
+  mutate(present_value_rr = difference_per_ton / ((1 + ramsey_disc_rate/100) ^ t_future))
+
+# sum present value for 2022 to 2100 under rr discount rate
+# sums to $74.57
+# add this point to the plot from above 
+sum_pv_rr <- sum(damages_rr$present_value_rr[1:79])
+
+sum_pv_rr
+
+# copy and pasted plot, add label for rr point 
+ggplot(data = pv_disc_rate, aes(x = disc_rate_vector, y = sum_pv_vector)) +
+  geom_point() + 
+  geom_line() +
+  scale_x_continuous(n.breaks = 10) +
+  scale_y_continuous(n.breaks = 8) +
+  geom_point(aes(x = 0.021, y = 74.57), color = "goldenrod3", size = 3) +
+  geom_label(aes(x = 0.038, y = 85, label = "Ramsey Rule SCC, $74", color = "goldenrod4")) +
+  labs(x = "Discount Rate (%)", 
+       y = "Social Cost of Carbon ($/ton of Carbon Dioxide)", 
+       title = "Social Cost of Carbon by Discount Rate") +
+  theme_grey()
 ```
 
 ## Question 5 
