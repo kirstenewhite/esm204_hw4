@@ -263,6 +263,73 @@ facts:
 *   Society is risk neutral
 *   Use a discount rate of 2%
 
+```{r}
+# Policy A - 50% chance baseline (w/o pulse) warming happens and 
+# 50% chance of warming being 1.5x baseline each year 
+
+# Find npv and damages for baseline and 1.5x warming scenarios with 2% discount rate 
+warming$t_future <- warming$year-2022
+
+policy_a <- warming %>%
+  
+  # calc baseline npv
+  mutate(npv_baseline = warming$warming_no_pulse/(1 + 0.2) ^ warming$t_future) %>%
+  
+  # sum total damages of baseline npv
+  mutate(damages_baseline = sum(npv_baseline[1:79]) * 0.5) %>%
+           
+  # find total damages of warming 1.5x the baseline
+  mutate(damages_1.5x = warming$warming_no_pulse*1.5) %>%
+    
+  # calc npv w/ damages warming 1.5x the baseline
+  mutate(npv_1.5x = damages_1.5x/((1 + 0.2) ^ warming$t_future))
+  
+# sum the present values for each option in policy a
+sum_damages_baseline <- sum(policy_a$npv_baseline)
+sum_damages_1.5x <- sum(policy_a$npv_1.5x)
+
+# find expected value of policy A, apply probability to sum and add
+expected_value_policy_a <- (sum_damages_baseline*0.5) + (sum_damages_1.5x*0.5)
+expected_value_policy_a
+
+# Policy B - warming continues until 2050 as in the “baseline” then stabilizes and stays at 1.29 degrees
+
+  
+  # calc baseline npv
+npv_baseline <- warming$warming_no_pulse/(1 + 0.2) ^ warming$t_future
+
+  # calc damages for up to when temp stabilizes
+damages_baseline <- warming$warming_no_pulse[1:29]
+  
+ # calc npv for up to when temp stabilizes
+npv_prestablize <- warming$warming_no_pulse[1:29]/(1 + 0.2) ^ warming$t_future
+  
+  # find baseline npv for up to when temp stabilizes
+npv_prestable <- npv_baseline[1:29] 
+  
+  # find damages after temp stabilizes
+damages_stabilize <- warming$warming_no_pulse[30:79]
+  
+  # find npv after temp stabilizes
+npv_poststabilize <- npv_baseline[30:79]
+
+# Create df with values from both pre and post warming stabilization 
+
+policy_b_pre <- data.frame(year = warming$year[1:29], 
+                       npv = npv_prestable, 
+                       damages = damages_baseline)
+
+policy_b_post <- data.frame(year = warming$year[30:79],
+                            npv = npv_poststabilize, 
+                            damages = damages_stabilize)
+
+# Combine df and sum damages
+joined_policy_b <- rbind(policy_b_pre, policy_b_post)
+total_policy_b <-sum(joined_policy_b$damages[1:79])
+total_policy_b
+```
+
+
 What is the expected present value of damages up to 2100 under Policy A? What is the expected present value of damages up to 2100 under Policy B? Suppose undertaking Policy A costs zero and undertaking Policy B costs X. The total cost of a policy is the implementation
 cost plus expected damages. Make a plot of total cost of Policy A and total cost of Policy B against X. Suppose Congress wants to undertake the policy with the lower total cost. Use your graph to advise Congress.
 
