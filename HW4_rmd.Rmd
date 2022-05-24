@@ -18,6 +18,7 @@ library(tidyverse)
 library(janitor)
 library(equatiomatic)
 library(broom)
+library(scales)
 ```
 
 ```{r}
@@ -264,69 +265,75 @@ facts:
 *   Use a discount rate of 2%
 
 ```{r}
-# Policy A - 50% chance baseline (w/o pulse) warming happens and 
-# 50% chance of warming being 1.5x baseline each year 
+# POLICY A
+# Create dataset for policy a with npv and damages of both scenarios
 
-# Find npv and damages for baseline and 1.5x warming scenarios with 2% discount rate 
-warming$t_future <- warming$year-2022
+# First create a function of net present value 
+pv_function <- function(rate, damage, time, present_time)
+  {NPV <- damage/ (1 + (rate/100))^(time-present_time)
+  return(NPV)}
 
 policy_a <- warming %>%
+  # calc pv for baseline
+  mutate(pv_baseline = pv_function(0.02, warming$warming_no_pulse, warming$year, 2022)) %>%
   
-  # calc baseline npv
-  mutate(npv_baseline = warming$warming_no_pulse/(1 + 0.2) ^ warming$t_future) %>%
+  # calc damages for 1.5x warming
+  mutate(damages_1.5x_warming = model_damages(1.5*warming_baseline)) %>%
   
-  # sum total damages of baseline npv
-  mutate(damages_baseline = sum(npv_baseline[1:79]) * 0.5) %>%
-           
-  # find total damages of warming 1.5x the baseline
-  mutate(damages_1.5x = warming$warming_no_pulse*1.5) %>%
-    
-  # calc npv w/ damages warming 1.5x the baseline
-  mutate(npv_1.5x = damages_1.5x/((1 + 0.2) ^ warming$t_future))
+  # calc pv for 1.5x warming 
+  mutate(pv_1.5x_warming = pv_function(0.02, damages_1.5x_warming, warming$year, 2022)) 
   
-# sum the present values for each option in policy a
-sum_damages_baseline <- sum(policy_a$npv_baseline)
-sum_damages_1.5x <- sum(policy_a$npv_1.5x)
+# sum pv for each option in policy a
+sum_baseline <- sum(policy_a$pv_baseline)
+sum_1.5x_warming <- sum(policy_a$pv_1.5x_warming)
 
-# find expected value of policy A, apply probability to sum and add
-expected_value_policy_a <- (sum_damages_baseline*0.5) + (sum_damages_1.5x*0.5)
-expected_value_policy_a
+total_policy_a <- sum_baseline*0.5 + sum_1.5x_warming*0.5
+total_policy_a
 
-# Policy B - warming continues until 2050 as in the “baseline” then stabilizes and stays at 1.29 degrees
 
+```
+```{r}
+# POLICY B, repeat above process
+# warming continues at baseline level until 2050 then stabilizes at 1.29 degrees and stays that way forever
+
+policy_b <- warming %>%
+  select(year, warming_baseline)
   
-  # calc baseline npv
-npv_baseline <- warming$warming_no_pulse/(1 + 0.2) ^ warming$t_future
+  # lock warming at 1.29 degrees starting at year 2050 
+  for (i in 30:79)
+  {policy_b$warming_baseline[i]=1.29}
 
-  # calc damages for up to when temp stabilizes
-damages_baseline <- warming$warming_no_pulse[1:29]
+policy_b <- warming %>%
   
- # calc npv for up to when temp stabilizes
-npv_prestablize <- warming$warming_no_pulse[1:29]/(1 + 0.2) ^ warming$t_future
-  
-  # find baseline npv for up to when temp stabilizes
-npv_prestable <- npv_baseline[1:29] 
-  
-  # find damages after temp stabilizes
-damages_stabilize <- warming$warming_no_pulse[30:79]
-  
-  # find npv after temp stabilizes
-npv_poststabilize <- npv_baseline[30:79]
+  # calc damages w this policy 
+  mutate(policy_b_damages = model_damages(warming_baseline)) %>%
+  mutate(pv_policy_b = pv_function(0.02, policy_b_damages, warming$year, 2022))
 
-# Create df with values from both pre and post warming stabilization 
+total_policy_b <- sum(policy_b$pv_policy_b)*1
 
-policy_b_pre <- data.frame(year = warming$year[1:29], 
-                       npv = npv_prestable, 
-                       damages = damages_baseline)
 
-policy_b_post <- data.frame(year = warming$year[30:79],
-                            npv = npv_poststabilize, 
-                            damages = damages_stabilize)
+#Plot policy a and b costs
 
-# Combine df and sum damages
-joined_policy_b <- rbind(policy_b_pre, policy_b_post)
-total_policy_b <-sum(joined_policy_b$damages[1:79])
-total_policy_b
+#write functions to find the cost of implementing each policy 
+policy_b_model <- function(x){total_policy_b +x}
+policy_a_model <- function(x){total_policy_a}
+
+# make a vector of potential costs
+
+difference <- total_policy_a - total_policy_b
+
+ggplot() +
+  scale_color_manual(values = c('goldenrod3', 'green')) +
+  stat_function(fun = policy_b_model, color = 'goldenrod3') +
+  stat_function(fun = policy_a_model, color = 'green') +
+  ylim(0, 10e+15) +
+  xlim(0, 10e+15) +
+  labs(x = "Implenetation Cost ($)",
+       y = "Total Cost",
+       title = "Comparing Policy A and B Costs",
+       caption = "Figure X. Policy A (purple) indicates there is no implementation cost. Policy B (orange) shows there is an implementation cost of X") +
+  theme_minimal()
+
 ```
 
 
