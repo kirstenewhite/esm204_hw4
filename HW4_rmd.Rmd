@@ -270,24 +270,27 @@ facts:
 
 # First create a function of net present value 
 pv_function <- function(rate, damage, time, present_time)
-  {NPV <- damage/ (1 + (rate/100))^(time-present_time)
+  {NPV <- damage/ (1 + (rate))^(time-present_time)
   return(NPV)}
 
 policy_a <- warming %>%
+  select(year, warming_baseline, warming_no_pulse) %>%
   # calc pv for baseline
-  mutate(pv_baseline = pv_function(0.02, warming$warming_no_pulse, warming$year, 2022)) %>%
+  mutate(pv_baseline = pv_function(0.02, warming_no_pulse, year, 2022)) %>%
   
   # calc damages for 1.5x warming
   mutate(damages_1.5x_warming = model_damages(1.5*warming_baseline)) %>%
   
   # calc pv for 1.5x warming 
-  mutate(pv_1.5x_warming = pv_function(0.02, damages_1.5x_warming, warming$year, 2022)) 
+  mutate(pv_1.5x_warming = pv_function(0.02, damages_1.5x_warming, year, 2022)) 
   
 # sum pv for each option in policy a
 sum_baseline <- sum(policy_a$pv_baseline)
 sum_1.5x_warming <- sum(policy_a$pv_1.5x_warming)
 
 total_policy_a <- sum_baseline*0.5 + sum_1.5x_warming*0.5
+sum_baseline
+sum_1.5x_warming
 total_policy_a
 
 
@@ -300,16 +303,18 @@ policy_b <- warming %>%
   select(year, warming_baseline)
   
   # lock warming at 1.29 degrees starting at year 2050 
-  for (i in 30:79)
-  {policy_b$warming_baseline[i]=1.29}
+for (i in 30:79){
+  policy_b$warming_baseline[i]=1.29
+  }
 
-policy_b <- warming %>%
+policy_b <- policy_b %>%
   
   # calc damages w this policy 
   mutate(policy_b_damages = model_damages(warming_baseline)) %>%
   mutate(pv_policy_b = pv_function(0.02, policy_b_damages, warming$year, 2022))
 
 total_policy_b <- sum(policy_b$pv_policy_b)*1
+total_policy_b
 
 
 #Plot policy a and b costs
@@ -330,11 +335,12 @@ ggplot() +
   xlim(0, 10e+15) +
   labs(x = "Implenetation Cost ($)",
        y = "Total Cost",
-       title = "Comparing Policy A and B Costs",
-       caption = "Figure X. Policy A (purple) indicates there is no implementation cost. Policy B (orange) shows there is an implementation cost of X") +
+       title = "Comparing Policy A and B Costs") +
   theme_minimal()
 
 ```
+
+
 
 
 What is the expected present value of damages up to 2100 under Policy A? What is the expected present value of damages up to 2100 under Policy B? Suppose undertaking Policy A costs zero and undertaking Policy B costs X. The total cost of a policy is the implementation
