@@ -346,7 +346,7 @@ ggplot() +
 * Policy A: The cost of damages (at present value) = $3165 trillion (3.165075e+15)
 * Policy B: The cost of damages (at present value) = $869 trillion (8.691552e+15)
 
-Policy B is recommended if implementation cost is less than $2,380 trillion billion dollars. If the cost exceeds $2,380 trillion dollars (see dashed line), Policy A is recommended. This recommendation is based on minimizing costs and given that the total cost of Policy A is the present value of damages through 2100 and total cost of Policy B is the sum of the implementation cost and the present value of those damages through 2100.
+Policy B is recommended if implementation cost is less than ~$2,380 trillion billion dollars. If the cost exceeds ~$2,380 trillion dollars (see dashed line), Policy A is recommended. This recommendation is based on minimizing costs and given that the total cost of Policy A is the present value of damages through 2100 and total cost of Policy B is the sum of the implementation cost and the present value of those damages through 2100.
 
 
 ## Question 6 
