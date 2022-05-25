@@ -264,6 +264,9 @@ facts:
 *   Society is risk neutral
 *   Use a discount rate of 2%
 
+What is the expected present value of damages up to 2100 under Policy A? What is the expected present value of damages up to 2100 under Policy B? Suppose undertaking Policy A costs zero and undertaking Policy B costs X. The total cost of a policy is the implementation
+cost plus expected damages. Make a plot of total cost of Policy A and total cost of Policy B against X. Suppose Congress wants to undertake the policy with the lower total cost. Use your graph to advise Congress.
+
 ```{r}
 # POLICY A
 # Create dataset for policy a with npv and damages of both scenarios
@@ -289,9 +292,7 @@ sum_baseline <- sum(policy_a$pv_baseline)
 sum_1.5x_warming <- sum(policy_a$pv_1.5x_warming)
 
 total_policy_a <- sum_baseline*0.5 + sum_1.5x_warming*0.5
-sum_baseline
-sum_1.5x_warming
-total_policy_a
+
 
 
 ```
@@ -314,7 +315,7 @@ policy_b <- policy_b %>%
   mutate(pv_policy_b = pv_function(0.02, policy_b_damages, warming$year, 2022))
 
 total_policy_b <- sum(policy_b$pv_policy_b)*1
-total_policy_b
+
 
 
 #Plot policy a and b costs
@@ -329,22 +330,21 @@ difference <- total_policy_a - total_policy_b
 
 ggplot() +
   scale_color_manual(values = c('goldenrod3', 'green')) +
-  stat_function(fun = policy_b_model, color = 'goldenrod3') +
-  stat_function(fun = policy_a_model, color = 'green') +
+  stat_function(fun = policy_b_model, color = 'goldenrod3', size = 1) +
+  stat_function(fun = policy_a_model, color = 'green', size = 1) +
   ylim(0, 10e+15) +
   xlim(0, 10e+15) +
-  labs(x = "Implenetation Cost ($)",
+  labs(x = "Implementation Cost ($)",
        y = "Total Cost",
-       title = "Comparing Policy A and B Costs") +
-  theme_minimal()
+       title = "Cost Comparison: Policy A and B") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, size = 12, face = "bold"))
 
 ```
 
+* Policy A: The cost of damages (at present value) = $1960 trillion 
+* Policy B: The cost of damages (at present value) = $869 trillion 
 
-
-
-What is the expected present value of damages up to 2100 under Policy A? What is the expected present value of damages up to 2100 under Policy B? Suppose undertaking Policy A costs zero and undertaking Policy B costs X. The total cost of a policy is the implementation
-cost plus expected damages. Make a plot of total cost of Policy A and total cost of Policy B against X. Suppose Congress wants to undertake the policy with the lower total cost. Use your graph to advise Congress.
 
 
 
